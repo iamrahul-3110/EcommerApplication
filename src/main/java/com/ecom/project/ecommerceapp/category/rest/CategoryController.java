@@ -12,29 +12,43 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api") // Base URL for all endpoints in this controller
 public class CategoryController {
 
     @Autowired // No need for explicit constructor injection
     private CategoryService categoryService;
 
-    @GetMapping("/api/public/categories/get")
-    public List<CategoryVo> getAllCategories() {
-        return categoryService.getAllCategories();
+    // @RequestMapping(value = "/public/categories/get", method = RequestMethod.GET) // Old way of mapping GET request this is for all HTTP methods
+    @GetMapping("/public/categories/get")
+    public ResponseEntity<List<CategoryVo>> getAllCategories() {
+        return new ResponseEntity<>(categoryService.getAllCategories(), new HttpHeaders(), HttpStatus.OK);
     }
 
-    @PostMapping("/api/admin/categories/add")
-    public CategoryVo addCategory(@RequestBody CategoryVo categoryVo) {
+    @PostMapping("/admin/categories/add")
+    public ResponseEntity<String> addCategory(@RequestBody CategoryVo categoryVo) {
         categoryService.addCategory(categoryVo);
-        return categoryVo;
+        return new ResponseEntity<>("Category added successfully", HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/api/admin/categories/delete/{categoryId}")
+    @DeleteMapping("/admin/categories/delete/{categoryId}")
     public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
         try {
             String status = categoryService.deleteCategory(categoryId);
+//            return ResponseEntity.ok(status); // Another way to send 200 OK with body
+//            return ResponseEntity.status(HttpStatus.OK).body(status); // Another way to send 200 OK with body
             return new ResponseEntity<>(status, HttpStatus.OK); // Now we have grip over status code using ResponseEntity
         } catch (ResponseStatusException e) {
             return new ResponseEntity<>(e.getReason(),e.getStatusCode()); // wrap the error message and status code in the response entity
+        }
+    }
+
+    @PutMapping("/admin/categories/update/{categoryId}")
+    public ResponseEntity<String> upadateCategory(@PathVariable Long categoryId, @RequestBody CategoryVo categoryVo) {
+        try {
+            CategoryVo saveCategory = categoryService.updateCategory(categoryVo, categoryId);
+            return new ResponseEntity<>("Category updated successfully", HttpStatus.OK);
+        } catch (ResponseStatusException e) {
+            return new ResponseEntity<>(e.getReason(), e.getStatusCode());
         }
     }
 }
