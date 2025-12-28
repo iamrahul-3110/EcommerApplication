@@ -1,5 +1,6 @@
 package com.ecom.project.ecommerceapp.common.handler;
 
+import com.ecom.project.ecommerceapp.category.payload.APIResponse;
 import com.ecom.project.ecommerceapp.common.exception.ApiException;
 import com.ecom.project.ecommerceapp.common.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -30,14 +31,16 @@ public class GloblaExceptionHandler { // centralized exception handling
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> myResourceNotFoundHandler(ResourceNotFoundException ex) {
+    public ResponseEntity<APIResponse> myResourceNotFoundHandler(ResourceNotFoundException ex) {
         String message = ex.getMessage();
-        return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+        APIResponse apiResponse = new APIResponse(message, false);
+        return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ApiException.class)
-     public ResponseEntity<String> myApiExceptionHandler(ApiException ex) {
+     public ResponseEntity<APIResponse> myApiExceptionHandler(ApiException ex) {
          String message = ex.getMessage();
-         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+         APIResponse apiResponse = new APIResponse(message, false);
+         return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
     }
 }
