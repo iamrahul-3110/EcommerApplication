@@ -5,7 +5,7 @@ import com.ecom.project.ecommerceapp.category.payload.CategoryDTO;
 import com.ecom.project.ecommerceapp.category.payload.CategoryDtoResponse;
 
 public interface CategoryService {
-    CategoryDtoResponse getAllCategories();
+    CategoryDtoResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
     CategoryDTO addCategory(CategoryDTO categoryDTO);
 

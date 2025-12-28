@@ -3,6 +3,7 @@ package com.ecom.project.ecommerceapp.category.rest;
 import com.ecom.project.ecommerceapp.category.payload.CategoryDTO;
 import com.ecom.project.ecommerceapp.category.payload.CategoryDtoResponse;
 import com.ecom.project.ecommerceapp.category.service.CategoryService;
+import com.ecom.project.ecommerceapp.common.config.AppConstants;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,10 +17,21 @@ public class CategoryController {
     @Autowired // No need for explicit constructor injection
     private CategoryService categoryService;
 
+    @GetMapping("/public/echo") // this is only for understanding purpose of @RequestParam
+//    public ResponseEntity<String > echoMessage(@RequestParam(name = "message", defaultValue = "Hello World" ) String message) { // @RequestParam to get query parameter from URL
+    public ResponseEntity<String > echoMessage(@RequestParam(name = "message", required = false ) String message) { // required = false makes the parameter optional
+        return new ResponseEntity<>("Echo: " + message, HttpStatus.OK); // if you not provide message parameter it will take default value "Hello World"
+    }
+
     // @RequestMapping(value = "/public/categories/get", method = RequestMethod.GET) // Old way of mapping GET request this is for all HTTP methods
     @GetMapping("/public/categories/get")
-    public ResponseEntity<CategoryDtoResponse> getAllCategories() {
-        CategoryDtoResponse categoriesResponse = categoryService.getAllCategories();
+    public ResponseEntity<CategoryDtoResponse> getAllCategories(
+            @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
+            @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
+            @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_CATEGORY_BY) String sortBy, // sortBy is the field name to sort
+            @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIRECTION ) String sortOrder // choose between asc and desc
+    ) {
+        CategoryDtoResponse categoriesResponse = categoryService.getAllCategories(pageNumber,pageSize, sortBy, sortOrder);
         return new ResponseEntity<>(categoriesResponse, HttpStatus.OK); // returning 200 OK with body
     }
 
