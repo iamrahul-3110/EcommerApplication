@@ -2,6 +2,7 @@ package com.ecom.project.ecommerceapp.product.service.impl;
 
 import com.ecom.project.ecommerceapp.category.model.CategoryVo;
 import com.ecom.project.ecommerceapp.category.repository.CategoryRepository;
+import com.ecom.project.ecommerceapp.common.exception.ApiException;
 import com.ecom.project.ecommerceapp.common.exception.ResourceNotFoundException;
 import com.ecom.project.ecommerceapp.product.model.ProductVo;
 import com.ecom.project.ecommerceapp.product.payload.ProductDTO;
@@ -45,6 +46,13 @@ public class ProductServiceImpl implements ProductService {
         CategoryVo category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "Category Id", categoryId));
 
+        boolean isProductExists = productRepository
+                .findByProductNameAndCategoryVo(productDTO.getProductName(), category)
+                .isPresent();
+        if (isProductExists) {
+            throw new ApiException("Product with name '" + productDTO.getProductName() +
+                    "' already exists in category '" + category.getCategoryName() + "'");
+        }
         ProductVo productVo = modelMapper.map(productDTO, ProductVo.class);
         productVo.setCategoryVo(category);
         productVo.setImage("default.png");
@@ -62,6 +70,10 @@ public class ProductServiceImpl implements ProductService {
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> modelMapper.map(product, ProductDTO.class))
                 .toList();
+
+        if(products.isEmpty()) {
+            throw new ApiException("No products found in the database");
+        }
         ProductResponse productResponse = new ProductResponse();
         productResponse.setContent(productDTOS);
         return productResponse;
@@ -75,6 +87,9 @@ public class ProductServiceImpl implements ProductService {
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> modelMapper.map(product, ProductDTO.class))
                 .toList();
+        if(products.isEmpty()) {
+            throw new ApiException("No products found in category '" + category.getCategoryName() + "'");
+        }
         ProductResponse productResponse = new ProductResponse();
         productResponse.setContent(productDTOS);
         return productResponse;
