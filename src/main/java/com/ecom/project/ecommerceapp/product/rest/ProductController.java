@@ -1,4 +1,4 @@
-package com.ecom.project.ecommerceapp.product.controller;
+package com.ecom.project.ecommerceapp.product.rest;
 
 import com.ecom.project.ecommerceapp.product.payload.ProductDTO;
 import com.ecom.project.ecommerceapp.product.payload.ProductResponse;
